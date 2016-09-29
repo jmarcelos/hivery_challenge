@@ -1,5 +1,5 @@
+import re
 import scrapy
-
 
 class ColesSpider(scrapy.Spider):
     name = 'myspider'
@@ -13,9 +13,23 @@ class ColesSpider(scrapy.Spider):
             yield scrapy.Request(url=url, callback=self.get_homepages_url)
    
 
-    def get_products_url(self, urls):
-        return [u'http://shop.coles.com.au/online/national/coca-cola-soft-drink-coke-375ml-cans-7365777p', u'http://shop.coles.com.au/online/national/coca-cola-soft-drink-coke-zero-chilled']
+    def get_products_url(self, response):
+        url_rules = '//div[@class="outer-prod prodtile"]/@data-refresh'
+        products = response.xpath(url_rules).extract()
+        regex = r'"(.*?)"'
+        products_url = []
 
+        for product in products:
+            url = re.findall(regex, product)[4]
+            products_url.append(url)
+        
+        return products_url
+       
+    def get_next_page(self, response):
+        pagination_rule = '//ul[@class="navigator"]/li[@class="next"]/a/@href'
+        pagination = response.xpath(pagination_rule).extract()
+        
+        return pagination[0]
 
     def get_homepages_url(self, response):
         url_rules = '//ul[@id="subnav"]/li/a/@href'
