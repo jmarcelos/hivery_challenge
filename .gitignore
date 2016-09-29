@@ -1,0 +1,12 @@
+# Virtualenv
+.Python
+*.log
+*.ini
+*.pyc
+env_hivery/
+[Bb]in
+[Ii]nclude
+[Ll]ib
+[Ll]ocal
+# MacOSX
+.DS_Store
