@@ -1,7 +1,8 @@
+# encoding: utf-8
 import unittest
 from coles import ColesSpider
-from fake_response import coles_response
-
+from mocked_data import coles_response, get_product_details
+import items
 class TestColesSpider(unittest.TestCase):
 
     def test_get_drinks_homepages_urls(self):
@@ -26,8 +27,19 @@ class TestColesSpider(unittest.TestCase):
         pagination_rule = coles.get_next_page(response)
         self.assertEquals(pagination_rule, u'#pageNumber=2&currentPageSize=20')
         
+    def test_get_products_details(self):
+        coles = ColesSpider('http://shop.coles.com.au/online/national/drinks')
+        product_urls = []
+        products_detail = coles.get_products_details(product_urls)
+        expected_products_detail = get_product_details()
+        self.assertTrue(sorted(products_detail[0].items()) == sorted(expected_products_detail[0].items()))
 
-
+    def test_get_product_detail(self):
+        coles = ColesSpider('http://shop.coles.com.au/online/national/drinks')
+        response = coles_response('product-detail-beer.html')
+        product = coles.get_product_detail(response)
+        self.assertEquals(product['name'], u'Birell Ultra Light Beer')
+        self.assertEquals(product["brand"], u'Birell')
 
 if __name__ == '__main__':
     unittest.main()
