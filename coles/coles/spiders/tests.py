@@ -13,26 +13,58 @@ class TestColesSpider(unittest.TestCase):
         self.assertEquals(urls[0], u'http://shop.coles.com.au/online/national/drinks/soft-drinks-3314551')
         self.assertEquals(urls[1], u'http://shop.coles.com.au/online/national/drinks/cordials')
 
-    def test_get_products_url(self):
+    def test_get_product_url_list(self):
         coles = ColesSpider('http://shop.coles.com.au/online/national/drinks')
         response = coles_response('drinks_list.html')
-        products_url = coles.get_products_url(response)
+        products_url, search_url = coles.get_products_url(response)
         self.assertEquals(len(products_url), 20)
         self.assertEquals(products_url[0], u'http://shop.coles.com.au/online/national/coca-cola-soft-drink-coke-375ml-cans-7365777p',)
         self.assertEquals(products_url[1], u'http://shop.coles.com.au/online/national/coca-cola-soft-drink-coke-zero-chilled')
 
-    def test_get_products_url_pagination(self):
-        coles = ColesSpider('http://shop.coles.com.au/online/national/drinks')
+    def test_get_search_url(self):
+        coles = ColesSpider('http://shop.coles.com.au')
+        search_url = coles.generate_search_url(1,2,3,4)
         response = coles_response('drinks_list.html')
-        pagination_rule = coles.get_next_page(response)
-        self.assertEquals(pagination_rule, u'#pageNumber=2&currentPageSize=20')
+        url = coles.get_search_url(response)
+        expected_url = "https://shop.coles.com.au/online/national/drinks/ColesCategoryView?orderBy=10601_6&productView=list&beginIndex=0&pageSize=100&catalogId=10576&storeId=10601&categoryId=3314551&localisationState=2&serviceId=ColesCategoryView"
+        self.assertEquals(url, expected_url)    
+   
+    def test_searh_url_none_end_of_page(self):
+        pass
+
+    def test_generate_search_url(self):
+        coles = ColesSpider('http://shop.coles.com.au')
+        search_url = coles.generate_search_url(1,2,3,4)
+        expected_url = u'https://shop.coles.com.au/online/national/drinks/ColesCategoryView?orderBy=1&productView=list&beginIndex=2&pageSize=100&catalogId=3&storeId=10601&categoryId=4&localisationState=2&serviceId=ColesCategoryView'
+        self.assertEquals(search_url, expected_url)
+
+    def test_extract_search_parameters(self):
+        coles = ColesSpider('http://shop.coles.com.au')
+        search_dirty_parameters = u"{refreshId:'searchView', productView:'list', orderBy:'10601_6', beginIndex:'0', pageSize:'20', storeId:'10601', catalogId:'10576', categoryId:'3314551',topcategoryId:'',browseView:'true'}"
         
-    def test_get_products_details(self):
-        coles = ColesSpider('http://shop.coles.com.au/online/national/drinks')
-        product_urls = []
-        products_detail = coles.get_products_details(product_urls)
-        expected_products_detail = get_product_details()
-        self.assertTrue(sorted(products_detail[0].items()) == sorted(expected_products_detail[0].items()))
+        order_by, begin_index, catalogId, categoryId = coles.extract_search_parameters(search_dirty_parameters)
+
+        self.assertEquals(order_by, '10601_6')
+        self.assertEquals(begin_index, '0')
+        self.assertEquals(catalogId, '10576')
+        self.assertEquals(categoryId, '3314551')
+
+
+    #def test_get_products_url_with_new_page(self):
+    #    coles = ColesSpider('http://shop.coles.com.au/online/national/drinks')
+    #    response = coles_response('drinks_list.html')
+    #    products_url, new_page = coles.get_products_url(response)
+    #    self.assertEquals(len(products_url), 20)
+    #    self.assertEquals(products_url[0], u'http://shop.coles.com.au/online/national/coca-cola-soft-drink-coke-375ml-cans-7365777p',)
+    #    self.assertEquals(products_url[1], u'http://shop.coles.com.au/online/national/coca-cola-soft-drink-coke-zero-chilled')
+    #    self.assertTrue(u'#pageNumber=2&currentPageSize=20' in new_page)
+
+
+    #def test_get_products_url_pagination(self):
+    #    coles = ColesSpider('http://shop.coles.com.au/online/national/drinks')
+    #    response = coles_response('drinks_list.html')
+    #    pagination_rule = coles.get_next_page(response)
+    #    self.assertEquals(pagination_rule, u'#pageNumber=2&currentPageSize=20')
 
     def test_get_product_detail(self):
         coles = ColesSpider('http://shop.coles.com.au/online/national/drinks')

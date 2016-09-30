@@ -9,6 +9,9 @@
 #     http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html
 #     http://scrapy.readthedocs.org/en/latest/topics/spider-middleware.html
 
+
+
+
 BOT_NAME = 'coles'
 
 SPIDER_MODULES = ['coles.spiders']
@@ -17,6 +20,7 @@ NEWSPIDER_MODULE = 'coles.spiders'
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'coles (+http://www.yourdomain.com)'
+USER_AGENT = "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
 
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = True
@@ -39,10 +43,13 @@ ROBOTSTXT_OBEY = True
 #TELNETCONSOLE_ENABLED = False
 
 # Override the default request headers:
-#DEFAULT_REQUEST_HEADERS = {
-#   'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-#   'Accept-Language': 'en',
-#}
+DEFAULT_REQUEST_HEADERS = {
+   'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+   'Accept-Language': 'en',
+   "Accept-Encoding":"gzip, deflate, sdch, br",
+   "Host":"shop.coles.com.au",
+   "Accept-Language":"en-US,en;q=0.8,pt;q=0.6"
+}
 
 # Enable or disable spider middlewares
 # See http://scrapy.readthedocs.org/en/latest/topics/spider-middleware.html
