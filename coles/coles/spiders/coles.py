@@ -9,7 +9,7 @@ from items import Product
 
 
 class ColesSpider(scrapy.Spider):
-    name = 'myspider'
+    name = 'coles_general_spider'
     SEARCH_TOTAL_VALUES = 100
     
 
@@ -106,4 +106,45 @@ class ColesSpider(scrapy.Spider):
     def get_homepages_url(self, response):
         url_rules = '//ul[@id="subnav"]/li/a/@href'
         urls = response.xpath(url_rules).extract()
-        return urls 
+        return urls
+
+class ColesRegionLocator(scrapy.Spider):
+    name = "coles_region"
+    url = u'https://shop.coles.com.au/online/national/COLAjaxAutoSuggestCmd?searchTerm={}&expectedType=json-comment-filtered&serviceId=COLAjaxAutoSuggestCmd'
+
+
+    def __init__(self, *args, **kwargs):
+        super(ColesRegionLocator, self).__init__(*args, **kwargs)
+        areas = kwargs.get('areas') 
+        self.start_urls = [self.url.format(area) for area in areas]
+
+    def start_requests(self):
+        for url in self.start_urls:
+            yield scrapy.Request(url=url, callback=self.generate_regions)
+
+    def generate_regions(self, response):
+        dirty_json = re.sub('\s+', '', response.body)        
+        regions_string = dirty_json[2:-2]
+        regions = json.loads(regions_string)
+        
+        yield regions
+
+class ColesStoreLocatorSpider(scrapy.Spider):
+    name = "coles_stores"
+
+    def __init__(self, *args, **kwargs):
+        super(ColesStoreLocatorSpider, self).__init__(*args, **kwargs)
+        parameters = ''
+        if kwargs.get('state') is None or kwargs.get('state') is "":
+            parameters = u'?statename={0}'.format(kwargs.get('state'))
+        
+        self.start_urls = [kwargs.get('url') + parameters]
+
+    def start_requests(self):
+        for url in self.start_urls:
+            yield scrapy.Request(url=url, callback=self.yield_get_homepages_url)
+
+
+    def get_stores(self, response):
+        yield json.loads(response.body[1:-1])
+

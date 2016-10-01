@@ -1,0 +1,55 @@
+
+
+/*
+{
+	"serviceId": ["COLAjaxAutoSuggestCmd"],
+	"expectedType": ["json-comment-filtered"],
+	"searchTerm": ["3182"],
+	"DM_PersistentCookieCreated": "true",
+	"autoSuggestSearchResults": [
+		{
+			"state": "VIC",
+			"score": 8.029414,
+			"collectionpoint": "",
+			"suburb": "ST KILDA SOUTH",
+			"country": "AU",
+			"zoneid": "0645HD",
+			"webstoreid": "0645",
+			"lon": 144.98116,
+			"id": "14854",
+			"postcode": "3182",
+			"lat": -37.872868,
+			"servicetype": "HD"
+		},
+		{
+			"state": "VIC",
+			"score": 8.029414,
+			"collectionpoint": "",
+			"suburb": "ST KILDA",
+			"country": "AU",
+			"zoneid": "0482HD",
+			"webstoreid": "0482",
+			"lon": 144.9818,
+			"id": "5495",
+			"postcode": "3182",
+			"lat": -37.8637,
+			"servicetype": "HD"
+		},
+		{
+			"state": "VIC",
+			"score": 8.029414,
+			"collectionpoint": "",
+			"suburb": "ST KILDA WEST",
+			"country": "AU",
+			"zoneid": "0482HD",
+			"webstoreid": "0482",
+			"lon": 144.9712,
+			"id": "2789",
+			"postcode": "3182",
+			"lat": -37.858067,
+			"servicetype": "HD"
+		}
+		]
+}
+*/
+
