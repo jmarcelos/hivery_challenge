@@ -26,7 +26,7 @@ class TestColesSpider(unittest.TestCase):
         search_url = coles.generate_search_url(1,2,3,4)
         response = coles_response('drinks_list.html')
         url = coles.get_search_url(response)
-        expected_url = "https://shop.coles.com.au/online/national/drinks/ColesCategoryView?orderBy=10601_6&productView=list&beginIndex=0&pageSize=100&catalogId=10576&storeId=10601&categoryId=3314551&localisationState=2&serviceId=ColesCategoryView"
+        expected_url = "https://shop.coles.com.au/online/national/drinks/ColesCategoryView?orderBy=10601_6&productView=list&beginIndex=0&pageSize=100&catalogId=10576&storeId=10601&categoryId=3314551&localisationState=2&serviceId=ColesCategoryView&langId=-1"
         self.assertEquals(url, expected_url)    
    
     def test_searh_url_none_end_of_page(self):
@@ -35,7 +35,7 @@ class TestColesSpider(unittest.TestCase):
     def test_generate_search_url(self):
         coles = ColesSpider('http://shop.coles.com.au')
         search_url = coles.generate_search_url(1,2,3,4)
-        expected_url = u'https://shop.coles.com.au/online/national/drinks/ColesCategoryView?orderBy=1&productView=list&beginIndex=2&pageSize=100&catalogId=3&storeId=10601&categoryId=4&localisationState=2&serviceId=ColesCategoryView'
+        expected_url = u'https://shop.coles.com.au/online/national/drinks/ColesCategoryView?orderBy=1&productView=list&beginIndex=2&pageSize=100&catalogId=3&storeId=10601&categoryId=4&localisationState=2&serviceId=ColesCategoryView&langId=-1'
         self.assertEquals(search_url, expected_url)
 
     def test_extract_search_parameters(self):

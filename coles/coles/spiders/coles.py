@@ -24,10 +24,21 @@ class ColesSpider(scrapy.Spider):
     def get_product_detail(self, response):
         dirty_name = response.xpath('//div[@id="FBLikeDiv"]/@data-social').extract()[0] 
         regex = r"'(.*?)'"
-        name  = re.findall(regex, dirty_name)[2]
+        name  = re.findall(regex, dirty_name)[2] 
 
         brand = response.xpath('//div[@class="brand"]/text()').extract()[0]
-        product = Product(name=name.rstrip(), brand=brand)
+        product_info = response.xpath('//div[@id="FBLikeDiv"]/@data-social').extract()[0]
+        description = re.findall(regex, product_info)[3] or "Not Available"
+
+        product_img = re.findall(regex, product_info)[0]
+        
+        url_friendly_name_dirty = re.findall(regex, product_info)[1]
+        url_friendly_name = url_friendly_name_dirty.split('/')[-1]
+        
+        social_data= response.xpath('//div[@id="reviewsCommentsDiv"]/@data-social').extract()[0]
+        product_id = re.findall(regex, social_data)[0]
+
+        product = Product(name=name.rstrip(), brand=brand, description=description, url_friendly_name=url_friendly_name, product_img=product_img, id=product_id)
         return product
 
     def yield_get_search_page(self, response):
@@ -44,16 +55,16 @@ class ColesSpider(scrapy.Spider):
 
     def extract_search_parameters(self, search_dirty_parameters):
         regex = r"'(.*?)'"
-        order_by = re.findall(regex, search_dirty_parameters)[2]
-        begin_index = re.findall(regex, search_dirty_parameters)[3]
-        catalogId = re.findall(regex, search_dirty_parameters)[6] 
-        categoryId =  re.findall(regex, search_dirty_parameters)[7]
+        order_by = re.findall(regex, search_dirty_parameters)[2] or ""
+        begin_index = re.findall(regex, search_dirty_parameters)[3] or ""
+        catalogId = re.findall(regex, search_dirty_parameters)[6]  or ""
+        categoryId =  re.findall(regex, search_dirty_parameters)[7] or ""
 
         return order_by, begin_index, catalogId, categoryId
 
 
     def generate_search_url(self, order_by, begin_index, catalogId, categoryId):
-        search_url = u'https://shop.coles.com.au/online/national/drinks/ColesCategoryView?orderBy={0}&productView=list&beginIndex={1}&pageSize={2}&catalogId={3}&storeId=10601&categoryId={4}&localisationState=2&serviceId=ColesCategoryView'.format(order_by, begin_index, self.SEARCH_TOTAL_VALUES, catalogId, categoryId)
+        search_url = u'https://shop.coles.com.au/online/national/drinks/ColesCategoryView?orderBy={0}&productView=list&beginIndex={1}&pageSize={2}&catalogId={3}&storeId=10601&categoryId={4}&localisationState=2&serviceId=ColesCategoryView&langId=-1'.format(order_by, begin_index, self.SEARCH_TOTAL_VALUES, catalogId, categoryId)
         
         return search_url
 
@@ -75,10 +86,10 @@ class ColesSpider(scrapy.Spider):
             url = re.findall(regex, product)[4]
             products_url.append(url)
        
-        if len(products) < self.SEARCH_TOTAL_VALUES:
+        search_url = None
+        if len(products) == self.SEARCH_TOTAL_VALUES:
             search_rules = '//div[@id="searchDisplay"]/@data-refresh'
             search_dirty_parameters_list = response.xpath(search_rules).extract()
-            search_url = None
             if len(search_dirty_parameters_list) > 0:
                 search_dirty_parameters = search_dirty_parameters_list[0]
                 order_by, begin_index, catalogId, categoryId = self.extract_search_parameters(search_dirty_parameters)
@@ -91,8 +102,6 @@ class ColesSpider(scrapy.Spider):
         
         for url in urls:
             yield scrapy.Request(url=url, callback=self.yield_get_search_page)
-
-
 
     def get_homepages_url(self, response):
         url_rules = '//ul[@id="subnav"]/li/a/@href'

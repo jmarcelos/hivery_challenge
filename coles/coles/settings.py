@@ -10,8 +10,6 @@
 #     http://scrapy.readthedocs.org/en/latest/topics/spider-middleware.html
 
 
-
-
 BOT_NAME = 'coles'
 
 SPIDER_MODULES = ['coles.spiders']
@@ -71,10 +69,12 @@ DEFAULT_REQUEST_HEADERS = {
 
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
-#ITEM_PIPELINES = {
-#    'coles.pipelines.SomePipeline': 300,
-#}
+ITEM_PIPELINES = {'coles.pipelines.MongoDBPipeline':300 }
 
+MONGODB_SERVER = "localhost"
+MONGODB_PORT = 27017
+MONGODB_DB = "coles"
+MONGODB_COLLECTION = "test"
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See http://doc.scrapy.org/en/latest/topics/autothrottle.html
 #AUTOTHROTTLE_ENABLED = True
