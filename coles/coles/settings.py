@@ -14,12 +14,11 @@ BOT_NAME = 'coles'
 
 SPIDER_MODULES = ['coles.spiders']
 NEWSPIDER_MODULE = 'coles.spiders'
-
+CHROME_DRIVE_LOCATION = "/Users/joaomarcelo/Downloads/chromedriver"
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'coles (+http://www.yourdomain.com)'
-USER_AGENT = "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)"
-
+USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.116 Safari/537.36"
 # Obey robots.txt rules
 ROBOTSTXT_OBEY = False
 
@@ -42,10 +41,10 @@ ROBOTSTXT_OBEY = False
 
 # Override the default request headers:
 DEFAULT_REQUEST_HEADERS = {
-   'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+   'Accept': 'text/html,image/webp,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
    'Accept-Language': 'en',
    "Accept-Encoding":"gzip, deflate, sdch, br",
-   #"Host":"shop.coles.com.au",
+   "Host":"shop.coles.com.au",
    "Accept-Language":"en-US,en;q=0.8,pt;q=0.6"
 }
 
@@ -87,7 +86,7 @@ MONGODB_COLLECTION = "test"
 #AUTOTHROTTLE_TARGET_CONCURRENCY = 1.0
 # Enable showing throttling stats for every response received:
 #AUTOTHROTTLE_DEBUG = False
-
+DOWNLOAD_TIMEOUT = 120
 # Enable and configure HTTP caching (disabled by default)
 # See http://scrapy.readthedocs.org/en/latest/topics/downloader-middleware.html#httpcache-middleware-settings
 #HTTPCACHE_ENABLED = True

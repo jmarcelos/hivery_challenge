@@ -1,16 +1,21 @@
 import sys
+import os
 import os.path
 import re
-import scrapy
 import json
+
+import scrapy
+from selenium import webdriver
+
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
-from items import Product
-
+from items import Product, Region, PriceRegion
+import settings
 
 class ColesSpider(scrapy.Spider):
+    
     name = 'coles_general_spider'
-    SEARCH_TOTAL_VALUES = 100
+    SEARCH_TOTAL_VALUES = 20
     
 
     def __init__(self, *args, **kwargs):
@@ -25,16 +30,12 @@ class ColesSpider(scrapy.Spider):
         dirty_name = response.xpath('//div[@id="FBLikeDiv"]/@data-social').extract()[0] 
         regex = r"'(.*?)'"
         name  = re.findall(regex, dirty_name)[2] 
-
         brand = response.xpath('//div[@class="brand"]/text()').extract()[0]
         product_info = response.xpath('//div[@id="FBLikeDiv"]/@data-social').extract()[0]
         description = re.findall(regex, product_info)[3] or "Not Available"
-
         product_img = re.findall(regex, product_info)[0]
-        
         url_friendly_name_dirty = re.findall(regex, product_info)[1]
         url_friendly_name = url_friendly_name_dirty.split('/')[-1]
-        
         social_data= response.xpath('//div[@id="reviewsCommentsDiv"]/@data-social').extract()[0]
         product_id = re.findall(regex, social_data)[0]
 
@@ -87,14 +88,15 @@ class ColesSpider(scrapy.Spider):
             products_url.append(url)
        
         search_url = None
-        if len(products) == self.SEARCH_TOTAL_VALUES:
+        next_rules = '//li[@class="next"]'
+        has_next = len(response.xpath(next_rules).extract()) > 0 or False
+        if has_next:
             search_rules = '//div[@id="searchDisplay"]/@data-refresh'
             search_dirty_parameters_list = response.xpath(search_rules).extract()
             if len(search_dirty_parameters_list) > 0:
                 search_dirty_parameters = search_dirty_parameters_list[0]
                 order_by, begin_index, catalogId, categoryId = self.extract_search_parameters(search_dirty_parameters)
                 search_url = self.generate_search_url(order_by, int(begin_index) + self.SEARCH_TOTAL_VALUES, catalogId, categoryId)
-
         return products_url, search_url
 
     def yield_get_homepages_url(self, response):
@@ -108,18 +110,52 @@ class ColesSpider(scrapy.Spider):
         urls = response.xpath(url_rules).extract()
         return urls
 
+
+class ColesPriceRegion(scrapy.Spider):
+
+    name = 'coles_price_region'
+   
+    
+    def __init__(self, *args, **kwargs):
+        super(ColesPriceRegion, self).__init__(*args, **kwargs)
+        urls = kwargs.get('url')
+        self.start_urls = urls.split(',')
+        postcode = kwargs.get('postcode')
+        self.driver = self.get_driver_conf() 
+        
+        #self.start_urls = [self.url.format(area) for area in search_areas]
+
+    def get_driver_conf(self):
+        #chromedriver = 'CHROME_DRIVE_LOCATION'
+        #os.environ["webdriver.chrome.driver"] = chromedriver
+        #driver = webdriver.Chrome(chromedriver)
+        driver = None
+        return driver
+
+    def start_requests(self):
+        pass
+
+    def get_product_price_info(self, response):
+        price_region = PriceRegion(price=100, postcode=3182)
+        prices = [price_region]
+        product = Product(id = 84624, prices_region = prices)
+        return product
+
 class ColesRegionLocator(scrapy.Spider):
+    
     name = "coles_region"
     url = u'https://shop.coles.com.au/online/national/COLAjaxAutoSuggestCmd?searchTerm={}&expectedType=json-comment-filtered&serviceId=COLAjaxAutoSuggestCmd'
 
 
     def __init__(self, *args, **kwargs):
         super(ColesRegionLocator, self).__init__(*args, **kwargs)
-        areas = kwargs.get('areas') 
-        self.start_urls = [self.url.format(area) for area in areas]
+        areas = kwargs.get('areas')
+        search_areas = areas.split(',')
+        self.start_urls = [self.url.format(area) for area in search_areas]
 
     def start_requests(self):
         for url in self.start_urls:
+            print('scrapeando url {}'.format(url))
             yield scrapy.Request(url=url, callback=self.generate_regions)
 
     def generate_regions(self, response):
@@ -127,7 +163,27 @@ class ColesRegionLocator(scrapy.Spider):
         regions_string = dirty_json[2:-2]
         regions = json.loads(regions_string)
         
-        yield regions
+        suggestions = regions['autoSuggestSearchResults']
+        new_regions = []
+        
+        for suggestion in suggestions:
+            region = Region()
+            region['state'] = suggestion['state']
+            region['score'] = suggestion['score']
+            region['collectionpoint'] = suggestion['collectionpoint']
+            region['suburb'] = suggestion['suburb']
+            region['country'] = suggestion['country']
+            region['zoneid'] = suggestion['zoneid']
+            region['webstoreid'] = suggestion['webstoreid']
+            region['lon'] = suggestion['lon']
+            region['id'] = suggestion['id']
+            region['postcode'] = suggestion['postcode']
+            region['lat'] = suggestion['lat']
+            region['servicetype'] = suggestion['servicetype']
+            new_regions.append(region)
+
+        return new_regions
+
 
 class ColesStoreLocatorSpider(scrapy.Spider):
     name = "coles_stores"

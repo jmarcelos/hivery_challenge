@@ -9,3 +9,9 @@ creategit:
 	echo "# Virtualenv\n.Python\n*.log\n*.ini\n*.pyc\nenv_hivery/\n[Bb]in\n[Ii]nclude\n[Ll]ib\n[Ll]ocal\n# MacOSX\n.DS_Store" >> .gitignore
 	git init
 
+test:
+	env_hivery/bin/python coles/coles/spiders/tests.py
+
+mac-chrome-drive:
+	wget http://chromedriver.storage.googleapis.com/2.24/chromedriver_mac64.zip
+
