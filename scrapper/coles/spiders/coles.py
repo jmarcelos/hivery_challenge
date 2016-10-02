@@ -6,8 +6,7 @@ import json
 import scrapy
 from selenium import webdriver
 from scrapper.coles.items import Product, Region, PriceRegion
-
-import scrapper.coles.settings
+from scrapy.utils.project import get_project_settings
 
 class ColesSpider(scrapy.Spider):
     
@@ -123,9 +122,9 @@ class ColesPriceRegion(scrapy.Spider):
         #self.start_urls = [self.url.format(area) for area in search_areas]
 
     def get_driver_conf(self):
-        #chromedriver = 'CHROME_DRIVE_LOCATION'
-        #os.environ["webdriver.chrome.driver"] = chromedriver
-        #driver = webdriver.Chrome(chromedriver)
+        chromedriver = get_project_settings()['CHROME_DRIVE_LOCATION']
+        os.environ["webdriver.chrome.driver"] = chromedriver
+        driver = webdriver.Chrome(chromedriver)
         driver = None
         return driver
 

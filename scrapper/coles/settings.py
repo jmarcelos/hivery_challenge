@@ -14,7 +14,7 @@ BOT_NAME = 'coles'
 
 SPIDER_MODULES = ['coles.spiders']
 NEWSPIDER_MODULE = 'coles.spiders'
-CHROME_DRIVE_LOCATION = "/Users/joaomarcelo/Downloads/chromedriver"
+CHROME_DRIVE_LOCATION = "hivery/scrapper/chromedriver"
 
 # Crawl responsibly by identifying yourself (and your website) on the user-agent
 #USER_AGENT = 'coles (+http://www.yourdomain.com)'
