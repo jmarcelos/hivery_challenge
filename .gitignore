@@ -3,6 +3,7 @@
 *.log
 *.ini
 *.pyc
+*.egg-info
 env_hivery/
 [Bb]in
 [Ii]nclude

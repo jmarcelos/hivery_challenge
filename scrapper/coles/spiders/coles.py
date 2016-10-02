@@ -3,14 +3,11 @@ import os
 import os.path
 import re
 import json
-
 import scrapy
 from selenium import webdriver
+from scrapper.coles.items import Product, Region, PriceRegion
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
-
-from items import Product, Region, PriceRegion
-import settings
+import scrapper.coles.settings
 
 class ColesSpider(scrapy.Spider):
     

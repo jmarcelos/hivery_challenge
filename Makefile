@@ -10,7 +10,7 @@ creategit:
 	git init
 
 test:
-	env_hivery/bin/python coles/coles/spiders/tests.py
+	env_hivery/bin/python scrapper/coles/spiders/test/tests.py
 
 mac-chrome-drive:
 	wget http://chromedriver.storage.googleapis.com/2.24/chromedriver_mac64.zip

@@ -1,15 +1,15 @@
 # encoding: utf-8
 import unittest
-from coles import ColesSpider, ColesStoreLocatorSpider, ColesRegionLocator, ColesPriceRegion
+from scrapper.coles.spiders.coles import ColesSpider, ColesStoreLocatorSpider, ColesRegionLocator, ColesPriceRegion
 from mocked_data import coles_response, get_product_details
-import items
+import scrapper.coles.items
 
 
 class TestColesSpider(unittest.TestCase):
 
     def test_get_drinks_homepages_urls(self):
         coles = ColesSpider(url='http://shop.coles.com.au/online/national/drinks')
-        response = coles_response('drinks.html')
+        response = coles_response('fixtures/drinks.html')
         urls = coles.get_homepages_url(response)
         self.assertEquals(len(urls), 10)
         self.assertEquals(urls[0], u'http://shop.coles.com.au/online/national/drinks/soft-drinks-3314551')
@@ -17,7 +17,7 @@ class TestColesSpider(unittest.TestCase):
 
     def test_get_product_url_list(self):
         coles = ColesSpider(url='http://shop.coles.com.au/online/national/drinks')
-        response = coles_response('drinks_list.html')
+        response = coles_response('fixtures/drinks_list.html')
         products_url, search_url = coles.get_products_url(response)
         self.assertEquals(len(products_url), 20)
         self.assertEquals(products_url[0], u'http://shop.coles.com.au/online/national/coca-cola-soft-drink-coke-375ml-cans-7365777p',)
@@ -26,7 +26,7 @@ class TestColesSpider(unittest.TestCase):
     def test_get_search_url(self):
         coles = ColesSpider(url='http://shop.coles.com.au')
         search_url = coles.generate_search_url(1,2,3,4)
-        response = coles_response('drinks_list.html')
+        response = coles_response('fixtures/drinks_list.html')
         url = coles.get_search_url(response)
         expected_url = "https://shop.coles.com.au/online/national/drinks/ColesCategoryView?orderBy=10601_6&productView=list&beginIndex=0&pageSize=20&catalogId=10576&storeId=10601&categoryId=3314551&localisationState=2&serviceId=ColesCategoryView&langId=-1"
         self.assertEquals(url, expected_url)    
@@ -50,7 +50,7 @@ class TestColesSpider(unittest.TestCase):
 
     def test_get_products_and_next_page(self):
         coles = ColesSpider(url='http://shop.coles.com.au/online/national/drinks')
-        response = coles_response('page-with-next.html')
+        response = coles_response('fixtures/page-with-next.html')
         products_url, search_url = coles.get_products_url(response)
 
         self.assertEquals(len(products_url), 20)
@@ -61,7 +61,7 @@ class TestColesSpider(unittest.TestCase):
 
     def test_get_products_without_next_page(self):
         coles = ColesSpider(url='http://shop.coles.com.au/online/national/drinks')
-        response = coles_response('page-without-next.html')
+        response = coles_response('fixtures/page-without-next.html')
         products_url, search_url = coles.get_products_url(response)
 
         self.assertEquals(len(products_url), 0)
@@ -69,7 +69,7 @@ class TestColesSpider(unittest.TestCase):
 
     def test_get_product_detail(self):
         coles = ColesSpider(url='http://shop.coles.com.au/online/national/drinks')
-        response = coles_response('product-detail-beer.html')
+        response = coles_response('fixtures/product-detail-beer.html')
         product = coles.get_product_detail(response)
         self.assertEquals(product['name'], u'Birell Ultra Light Beer')
         self.assertEquals(product["brand"], u'Birell')
@@ -82,7 +82,7 @@ class TestColesPriceRegion(unittest.TestCase):
         url = 'http://shop.coles.com.au/online/national/birell-ultra-light-beer'
         
         coles_price = ColesPriceRegion(url=url, postcode=postcode)
-        response = coles_response('product-detail-beer-3182.html')
+        response = coles_response('fixtures/product-detail-beer-3182.html')
         product = coles_price.get_product_price_info(response)
 
         self.assertEquals(product['id'], 84624)
@@ -99,7 +99,7 @@ class TestColesRegionLocator(unittest.TestCase):
 
     def test_get_3182_post_code(self):
         coles_region = ColesRegionLocator(areas= '3182')
-        response = coles_response('store-regions.json')
+        response = coles_response('fixtures/store-regions.json')
         regions = coles_region.generate_regions(response)
 
         self.assertEquals(len(regions), 3)
@@ -111,7 +111,7 @@ class TestColesStoreLocator(unittest.TestCase):
 
     def test_QLD_stores(self):
         coles_stores = ColesStoreLocatorSpider(url='https://www.coles.com.au/storelocator/api/getAllStoreList', state='QLD')
-        response = coles_response('store-QLD.json')
+        response = coles_response('fixtures/store-QLD.json')
         stores = coles_stores.get_stores(response)
         stores = stores.next()
         self.assertEquals(len(stores['storesList']), 161)
