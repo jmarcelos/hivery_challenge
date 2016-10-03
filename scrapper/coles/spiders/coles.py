@@ -36,10 +36,12 @@ class ColesSpider(scrapy.Spider):
         product_id = re.findall(regex, social_data)[0]
 
         product = Product(name=name.rstrip(), brand=brand, description=description, url_friendly_name=url_friendly_name, product_img=product_img, id=product_id)
+
         return product
 
     def yield_get_search_page(self, response):
         search_url = self.get_search_url(response)
+        
         yield scrapy.Request(url=search_url, callback=self.yield_get_products_url)
 
 
@@ -106,6 +108,38 @@ class ColesSpider(scrapy.Spider):
         urls = response.xpath(url_rules).extract()
         return urls
 
+    def get_product_price_region(self, region, product):
+        url=self.get_price_per_region_url(region, product)
+        driver = self.get_url_content()
+        driver.get(url)
+        price = driver.find_element_by_xpath('//strong[@class="product-price"]').text
+        price_region = PriceRegion(price=price, postcode=3182)
+        prices = [price_region]
+        product['prices_region'] = prices 
+        return product 
+
+    def get_price_per_region_url(self, region, product):
+       
+        region = Region(state='VIC', score='8.029414', collectionpoint='',
+                suburb='ST KILDA SOUTH', country='AU', zone_id= '0645HD',
+                lon='144.98116', lat='-37.872868', service_type='HD', 
+                postcode='3182', webstore_id='0645', id='14854')
+        url = 'https://shop.coles.com.au/online/COLLocalisationControllerCmd'
+        params= "redirectUrl={0}&suburbPostCodeId={1}&serviceType={2}&externalffmcId={3}&state={4}&score={5}&collectionpoint={6}&suburb={7}&zoneid={8}&postcode={9}&longitude={10}&latitude={11}&storeId=10601".format(
+                  product['redirect_url'],region['id'],
+                  region['service_type'],region['webstore_id'],
+                  region['state'],region['score'],region['collectionpoint'],
+                  region['suburb'],region['zone_id'],region['postcode'],
+                  region['lon'],region['lat'],)
+        final_url = url + '?' + params
+        
+        return final_url
+
+    def get_url_content(self):
+        chromedriver = get_project_settings()['CHROME_DRIVE_LOCATION']
+        os.environ["webdriver.chrome.driver"] = chromedriver
+        driver = webdriver.Chrome(chromedriver)
+        return driver
 
 class ColesPriceRegion(scrapy.Spider):
 
@@ -122,9 +156,9 @@ class ColesPriceRegion(scrapy.Spider):
         #self.start_urls = [self.url.format(area) for area in search_areas]
 
     def get_driver_conf(self):
-        chromedriver = get_project_settings()['CHROME_DRIVE_LOCATION']
-        os.environ["webdriver.chrome.driver"] = chromedriver
-        driver = webdriver.Chrome(chromedriver)
+        #chromedriver = get_project_settings()['CHROME_DRIVE_LOCATION']
+        #os.environ["webdriver.chrome.driver"] = chromedriver
+        #driver = webdriver.Chrome(chromedriver)
         driver = None
         return driver
 
@@ -132,6 +166,7 @@ class ColesPriceRegion(scrapy.Spider):
         pass
 
     def get_product_price_info(self, response):
+        #mocked yet!!!
         price_region = PriceRegion(price=100, postcode=3182)
         prices = [price_region]
         product = Product(id = 84624, prices_region = prices)
@@ -169,13 +204,13 @@ class ColesRegionLocator(scrapy.Spider):
             region['collectionpoint'] = suggestion['collectionpoint']
             region['suburb'] = suggestion['suburb']
             region['country'] = suggestion['country']
-            region['zoneid'] = suggestion['zoneid']
-            region['webstoreid'] = suggestion['webstoreid']
+            region['zone_id'] = suggestion['zoneid']
+            region['webstore_id'] = suggestion['webstoreid']
             region['lon'] = suggestion['lon']
             region['id'] = suggestion['id']
             region['postcode'] = suggestion['postcode']
             region['lat'] = suggestion['lat']
-            region['servicetype'] = suggestion['servicetype']
+            region['service_type'] = suggestion['servicetype']
             new_regions.append(region)
 
         return new_regions

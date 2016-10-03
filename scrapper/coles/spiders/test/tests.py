@@ -1,12 +1,20 @@
 # encoding: utf-8
 import unittest
+import os
 from scrapper.coles.spiders.coles import ColesSpider, ColesStoreLocatorSpider, ColesRegionLocator, ColesPriceRegion
+from scrapy.settings import Settings
 from mocked_data import coles_response, get_product_details
-import scrapper.coles.items
-
+from scrapper.coles.items import Product, Region
+from mock import *
 
 class TestColesSpider(unittest.TestCase):
 
+    def setUp(self):
+        settings = Settings()
+        os.environ['SCRAPY_SETTINGS_MODULE'] = 'scrapper.coles.settings'
+        settings_module_path = os.environ['SCRAPY_SETTINGS_MODULE']
+        settings.setmodule(settings_module_path, priority='project')
+    
     def test_get_drinks_homepages_urls(self):
         coles = ColesSpider(url='http://shop.coles.com.au/online/national/drinks')
         response = coles_response('fixtures/drinks.html')
@@ -74,6 +82,30 @@ class TestColesSpider(unittest.TestCase):
         self.assertEquals(product['name'], u'Birell Ultra Light Beer')
         self.assertEquals(product["brand"], u'Birell')
 
+    def test_get_product_price_per_region(self):
+        coles = ColesSpider(url='http://shop.coles.com.au/online/national/drinks')
+        product = Product(id=84624, redirect_url = 'http://shop.coles.com.au/webapp/wcs/stores/servlet/national/pepsi-max-soft-drink-cola-375ml-cans-7366022p')
+        region = Region(state='VIC', score='8.029414', collectionpoint='',
+                suburb='ST KILDA SOUTH', country='AU', zone_id= '0645HD',
+                lon='144.98116', lat='-37.872868', service_type='HD', 
+                postcode='3182', webstore_id='0645', id='14854')
+        product = coles.get_product_price_region(region, product)
+
+        self.assertEquals(product['id'], 84624)
+        self.assertEquals(product['prices_region'][0]['postcode'], 3182)
+        self.assertEquals(product['prices_region'][0]['price'], '$21.77')
+
+    def test_generate_price_region_url(self):
+        coles = ColesSpider(url='http://shop.coles.com.au/online/national/drinks')
+        product = Product(redirect_url=u'http://shop.coles.com.au/webapp/wcs/stores/servlet/national/pepsi-max-soft-drink-cola-375ml-cans-7366022p')
+        region = Region(state='VIC', score='8.029414', collectionpoint='',
+                suburb='ST KILDA SOUTH', country='AU', zone_id= '0645HD',
+                lon='144.98116', lat='-37.872868', service_type='HD', 
+                postcode='3182', webstore_id='0645', id='14854')
+        price_region_url = coles.get_price_per_region_url(region, product)
+        expected_url = u'https://shop.coles.com.au/online/COLLocalisationControllerCmd?redirectUrl=http://shop.coles.com.au/webapp/wcs/stores/servlet/national/pepsi-max-soft-drink-cola-375ml-cans-7366022p&suburbPostCodeId=14854&serviceType=HD&externalffmcId=0645&state=VIC&score=8.029414&collectionpoint=&suburb=ST KILDA SOUTH&zoneid=0645HD&postcode=3182&longitude=144.98116&latitude=-37.872868&storeId=10601'
+        
+        self.assertEquals(price_region_url, expected_url)
 
 class TestColesPriceRegion(unittest.TestCase):
 
@@ -103,9 +135,9 @@ class TestColesRegionLocator(unittest.TestCase):
         regions = coles_region.generate_regions(response)
 
         self.assertEquals(len(regions), 3)
-        self.assertEquals(regions[0]['zoneid'], u'0645HD')
-        self.assertEquals(regions[1]['zoneid'], u'0482HD')
-        self.assertEquals(regions[2]['zoneid'], u'0482HD')
+        self.assertEquals(regions[0]['zone_id'], u'0645HD')
+        self.assertEquals(regions[1]['zone_id'], u'0482HD')
+        self.assertEquals(regions[2]['zone_id'], u'0482HD')
 
 class TestColesStoreLocator(unittest.TestCase):
 

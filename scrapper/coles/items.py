@@ -19,14 +19,13 @@ class Region(Item):
     collectionpoint = Field()
     suburb = Field()
     country = Field()
-    zoneid = Field()
-    webstoreid = Field()
+    zone_id = Field()
+    webstore_id = Field()
     lon = Field()
     id = Field()
     postcode = Field()
     lat = Field()
-    servicetype = Field()
-
+    service_type = Field()
 
 
 class Product(Item):
@@ -41,6 +40,7 @@ class Product(Item):
     id = Field()
     url_friendly_name = Field()
     prices_region = Field()
+    redirect_url = Field()
     #purchasing = response.xpath('//div[@class="purchasing"]').extract()
     #purchasing_price = response.xpath('//div[@class="purchasing"]/div[@class="price"]/text()').extract()
 
