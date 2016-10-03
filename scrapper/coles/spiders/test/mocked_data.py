@@ -22,11 +22,6 @@ def coles_response(filename, url=None):
 
     return response
 
-
-
-thisdir = os.path.dirname(__file__)
-
-
 def get_product_details():
     filename = 'product_details.json'
     if not filename[0] == '/':
