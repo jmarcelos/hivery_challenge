@@ -32,6 +32,12 @@ class Product(Item):
 
 
     name = Field()
+    ingredients = Field()
+    allergen = Field()
+    servings_per_pack = Field()
+    serving_size = Field()
+    retail_limit = Field()
+    ticket_type = Field()
     brand = Field()
     description = Field()
     product_img = Field()
@@ -41,6 +47,6 @@ class Product(Item):
     url_friendly_name = Field()
     prices_region = Field()
     redirect_url = Field()
-    #purchasing = response.xpath('//div[@class="purchasing"]').extract()
-    #purchasing_price = response.xpath('//div[@class="purchasing"]/div[@class="price"]/text()').extract()
-
+    price_type = Field()
+    general_price = Field()
+    size = Field()

@@ -1,11 +1,10 @@
 # encoding: utf-8
 import unittest
 import os
-from scrapper.coles.spiders.coles import ColesSpider, ColesStoreLocatorSpider, ColesRegionLocator, ColesPriceRegion
+from scrapper.coles.spiders.coles import ColesSpider
 from scrapy.settings import Settings
 from mocked_data import coles_response, get_product_details
 from scrapper.coles.items import Product, Region
-from mock import *
 
 class TestColesSpider(unittest.TestCase):
 
@@ -78,22 +77,36 @@ class TestColesSpider(unittest.TestCase):
     def test_get_product_detail(self):
         coles = ColesSpider(url='http://shop.coles.com.au/online/national/drinks')
         response = coles_response('fixtures/product-detail-beer.html')
+        region = Region(state='VIC', score='8.029414', collectionpoint='',
+                suburb='ST KILDA SOUTH', country='AU', zone_id= '0645HD',
+                lon='144.98116', lat='-37.872868', service_type='HD', 
+                postcode='3182', webstore_id='0645', id='14854')
+        coles.regions = [] 
         product = coles.get_product_detail(response)
+        import pdb; pdb.set_trace()
         self.assertEquals(product['name'], u'Birell Ultra Light Beer')
         self.assertEquals(product["brand"], u'Birell')
+        self.assertEquals(product["general_price"], u'8.25')
+        self.assertEquals(product["serving_size"], u'375ml')
+        self.assertEquals(product["size"], u'20')
+        self.assertEquals(product["brand"], u'Birell')
+        self.assertEquals(product['redirect_url'], u'https://shop.coles.com.au/webapp/wcs/stores/servlet/national/birell-ultra-light-beer')
 
     def test_get_product_price_per_region(self):
         coles = ColesSpider(url='http://shop.coles.com.au/online/national/drinks')
-        product = Product(id=84624, redirect_url = 'http://shop.coles.com.au/webapp/wcs/stores/servlet/national/pepsi-max-soft-drink-cola-375ml-cans-7366022p')
+        product = Product(id=84624, redirect_url = 'http://shop.coles.com.au/webapp/wcs/stores/servlet/national/pepsi-max-soft-drink-cola-375ml-cans-7366022p', prices_region= [])
         region = Region(state='VIC', score='8.029414', collectionpoint='',
                 suburb='ST KILDA SOUTH', country='AU', zone_id= '0645HD',
                 lon='144.98116', lat='-37.872868', service_type='HD', 
                 postcode='3182', webstore_id='0645', id='14854')
         product = coles.get_product_price_region(region, product)
-
+        product = coles.get_product_price_region(region, product)
+        
         self.assertEquals(product['id'], 84624)
-        self.assertEquals(product['prices_region'][0]['postcode'], 3182)
-        self.assertEquals(product['prices_region'][0]['price'], '$21.77')
+        self.assertEquals(product['prices_region'][0]['postcode'], '3182')
+        self.assertEquals(product['prices_region'][0]['postcode'], '3182')
+        self.assertEquals(product['prices_region'][1]['price'], '$14.00')
+        self.assertEquals(product['prices_region'][1]['price'], '$14.00')
 
     def test_generate_price_region_url(self):
         coles = ColesSpider(url='http://shop.coles.com.au/online/national/drinks')
@@ -107,46 +120,14 @@ class TestColesSpider(unittest.TestCase):
         
         self.assertEquals(price_region_url, expected_url)
 
-class TestColesPriceRegion(unittest.TestCase):
-
-    def test_get_price_based_on_store(self):
-        postcode = '3182'
-        url = 'http://shop.coles.com.au/online/national/birell-ultra-light-beer'
-        
-        coles_price = ColesPriceRegion(url=url, postcode=postcode)
-        response = coles_response('fixtures/product-detail-beer-3182.html')
-        product = coles_price.get_product_price_info(response)
-
-        self.assertEquals(product['id'], 84624)
-        self.assertEquals(product['prices_region'][0]['postcode'], 3182)
-        self.assertEquals(product['prices_region'][0]['price'], 100)
-        
-class TestColesRegionLocator(unittest.TestCase):
-
-    def test_coles_url_starters(self):
-        coles_region = ColesRegionLocator(areas= '3182,2010,6160')
-        self.assertEquals(len(coles_region.start_urls), 3)
-        self.assertEquals(coles_region.start_urls[0], u'https://shop.coles.com.au/online/national/COLAjaxAutoSuggestCmd?searchTerm=3182&expectedType=json-comment-filtered&serviceId=COLAjaxAutoSuggestCmd')
-
-
-    def test_get_3182_post_code(self):
-        coles_region = ColesRegionLocator(areas= '3182')
+    def test_get_region(self):
+        coles_region = ColesSpider(postcodes= '3182')
         response = coles_response('fixtures/store-regions.json')
-        regions = coles_region.generate_regions(response)
+        coles_region.get_region(response)
 
-        self.assertEquals(len(regions), 3)
-        self.assertEquals(regions[0]['zone_id'], u'0645HD')
-        self.assertEquals(regions[1]['zone_id'], u'0482HD')
-        self.assertEquals(regions[2]['zone_id'], u'0482HD')
-
-class TestColesStoreLocator(unittest.TestCase):
-
-    def test_QLD_stores(self):
-        coles_stores = ColesStoreLocatorSpider(url='https://www.coles.com.au/storelocator/api/getAllStoreList', state='QLD')
-        response = coles_response('fixtures/store-QLD.json')
-        stores = coles_stores.get_stores(response)
-        stores = stores.next()
-        self.assertEquals(len(stores['storesList']), 161)
+        self.assertEquals(coles_region.regions[0]['zone_id'], u'0645HD')
+        self.assertEquals(coles_region.regions[0]['postcode'], u'3182')
+        self.assertEquals(coles_region.regions[0]['webstore_id'], u'0645')
 
 
 if __name__ == '__main__':
