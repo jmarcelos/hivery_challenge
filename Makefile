@@ -1,10 +1,10 @@
-create: createenv
+create: createenv mac-chrome-drive
 
 createenv:
 	test -d env_hivery || virtualenv env_hivery
 	env_hivery/bin/pip install -Ur requirements.txt
+	env_hivery/bin/pip install -e .
 	touch ./env_hivery/bin/activate
-	mac-chrome-drive
 
 creategit:
 	echo "# Virtualenv\n.Python\n*.log\n*.ini\n*.pyc\nenv_hivery/\n[Bb]in\n[Ii]nclude\n[Ll]ib\n[Ll]ocal\n# MacOSX\n.DS_Store" >> .gitignore
