@@ -94,7 +94,7 @@ class TestColesSpider(unittest.TestCase):
 
     def test_get_product_price_per_region_same_price(self):
         coles = ColesSpider(url='http://shop.coles.com.au/online/national/drinks')
-        product = Product(id=84624, has_price_difference=False, redirect_url = 'http://shop.coles.com.au/webapp/wcs/stores/servlet/national/pepsi-max-soft-drink-cola-375ml-cans-7366022p', prices_region= [])
+        product = Product(id=84624, general_price=u'10.00', has_price_difference=False, redirect_url = 'http://shop.coles.com.au/webapp/wcs/stores/servlet/national/pepsi-max-soft-drink-cola-375ml-cans-7366022p', prices_region= [])
         region = Region(state='VIC', score='8.029414', collectionpoint='',
                 suburb='ST KILDA SOUTH', country='AU', zone_id= '0645HD',
                 lon='144.98116', lat='-37.872868', service_type='HD', 
@@ -111,7 +111,7 @@ class TestColesSpider(unittest.TestCase):
     
     def test_get_product_price_per_region(self):
         coles = ColesSpider(url='http://shop.coles.com.au/online/national/drinks')
-        product = Product(id=84624, has_price_difference=False, redirect_url = 'http://shop.coles.com.au/webapp/wcs/stores/servlet/national/pepsi-max-soft-drink-cola-375ml-cans-7366022p', prices_region= [])
+        product = Product(id=84624, general_price=u'10.00', has_price_difference=False, redirect_url = 'http://shop.coles.com.au/webapp/wcs/stores/servlet/national/pepsi-max-soft-drink-cola-375ml-cans-7366022p', prices_region= [])
         region = Region(state='VIC', score='8.029414', collectionpoint='',
                 suburb='ST KILDA SOUTH', country='AU', zone_id= '0645HD',
                 lon='144.98116', lat='-37.872868', service_type='HD', 

@@ -73,7 +73,7 @@ ITEM_PIPELINES = {'coles.pipelines.MongoDBPipeline':300 }
 MONGODB_SERVER = "localhost"
 MONGODB_PORT = 27017
 MONGODB_DB = "coles"
-MONGODB_COLLECTION = "test"
+MONGODB_COLLECTION = "coles_products"
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See http://doc.scrapy.org/en/latest/topics/autothrottle.html
 #AUTOTHROTTLE_ENABLED = True
