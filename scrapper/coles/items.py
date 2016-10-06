@@ -1,19 +1,13 @@
 # -*- coding: utf-8 -*-
-
-import datetime
 from scrapy.item import Item, Field
 
 class PriceRegion(Item):
 
-
     price = Field()
     postcode = Field()
 
-
-
 class Region(Item):
-
-    
+ 
     state = Field()
     score = Field()
     collectionpoint = Field()
@@ -29,7 +23,6 @@ class Region(Item):
 
 
 class Product(Item):
-
 
     name = Field()
     info = Field()

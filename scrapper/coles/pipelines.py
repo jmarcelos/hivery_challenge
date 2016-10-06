@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from pymongo import MongoClient
-from scrapy import log
 from scrapy.utils.project import get_project_settings
 
 class MongoDBPipeline(object):

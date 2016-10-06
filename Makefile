@@ -16,6 +16,9 @@ scrapy:
 test:
 	env_hivery/bin/python scrapper/coles/spiders/test/tests.py
 
+pylint:
+	env_hivery/bin/pylint scrapper/
+
 mac-chrome-drive:
 	wget http://chromedriver.storage.googleapis.com/2.24/chromedriver_mac64.zip
 	unzip chromedriver_mac64.zip -d scrapper

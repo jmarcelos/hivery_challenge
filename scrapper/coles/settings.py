@@ -41,11 +41,10 @@ ROBOTSTXT_OBEY = False
 
 # Override the default request headers:
 DEFAULT_REQUEST_HEADERS = {
-   'Accept': 'text/html,image/webp,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-   'Accept-Language': 'en',
-   "Accept-Encoding":"gzip, deflate, sdch, br",
-   "Host":"shop.coles.com.au",
-   "Accept-Language":"en-US,en;q=0.8,pt;q=0.6"
+        'Accept' : 'text/html,image/webp,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+        "Accept-Encoding" :"gzip, deflate, sdch, br",
+        "Host" : "shop.coles.com.au",
+        "Accept-Language" : "en-US,en;q=0.8,pt;q=0.6"
 }
 
 # Enable or disable spider middlewares
@@ -68,7 +67,7 @@ DEFAULT_REQUEST_HEADERS = {
 
 # Configure item pipelines
 # See http://scrapy.readthedocs.org/en/latest/topics/item-pipeline.html
-ITEM_PIPELINES = {'coles.pipelines.MongoDBPipeline':300 }
+ITEM_PIPELINES = {'coles.pipelines.MongoDBPipeline':300}
 
 MONGODB_SERVER = "localhost"
 MONGODB_PORT = 27017
