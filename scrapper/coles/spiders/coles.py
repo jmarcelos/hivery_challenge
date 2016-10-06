@@ -56,7 +56,7 @@ class ColesSpider(scrapy.Spider):
 
         product = Product(name=name.rstrip(), brand=brand, description=description, info=info, 
                             url_friendly_name=url_friendly_name, product_img=product_img, id=product_id, general_price=general_price,
-                            redirect_url=redirect_url, price_type=price_type, prices_region = [])
+                            redirect_url=redirect_url, price_type=price_type, prices_region=[], has_price_difference=False)
     
         for region in self.regions:
             product = self.get_product_price_region(region, product)
@@ -162,6 +162,11 @@ class ColesSpider(scrapy.Spider):
         driver = self.get_driver()
         driver.get(url)
         price = driver.find_element_by_xpath('//strong[@class="product-price"]').text
+        
+        #just update flag if there is no price difference
+        if  not product['has_price_difference']:
+            product['has_price_difference'] = product['general_price'] == price
+        
         price_region = PriceRegion(price=price, postcode=region['postcode'])
         product['prices_region'].append(price_region)
         return product 
