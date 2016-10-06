@@ -36,14 +36,9 @@ class ColesSpider(scrapy.Spider):
         product_info = response.xpath('//div[@id="FBLikeDiv"]/@data-social').extract()[0]
         redirect_url = response.xpath('//form [@action="COLLocalisationControllerCmd"]/input[@name="fullURLHttps"]/@value').extract()[0]
 
-        info = response.xpath('//div[@class="plain-box product-detail-left"]/p/text()').extract()
-        ingredients = info[0]
-        allergen = info[1]
-        servings_per_pack = info[2] 
-        serving_size = info[3]
-        retail_limit = info[4]
-        size = info[5]
-
+        info_answer = response.xpath('//div[@class="plain-box product-detail-left"]/p/text()').extract()
+        info_question = response.xpath('//div[@class="plain-box product-detail-left"]/h2/text()').extract()
+        info = dict(zip(info_answer, info_question))
 
         description = re.findall(regex, product_info)[3] or "Not Available"
         product_img = re.findall(regex, product_info)[0]
@@ -57,10 +52,9 @@ class ColesSpider(scrapy.Spider):
         regex = r'"(.*?)"'
         price_type = re.findall(regex, data)[9]
     
-        general_price = response.xpath('//div[@class="purchasing"]/div[@class="price"]/text()').extract()
+        general_price = response.xpath('//div[@class="purchasing"]/div[@class="price"]/text()').extract()[0]
 
-        product = Product(name=name.rstrip(), brand=brand, description=description, ingredients=ingredients, allergen=allergen, 
-                            servings_per_pack=servings_per_pack, size=size, retail_limit=retail_limit, serving_size=serving_size, 
+        product = Product(name=name.rstrip(), brand=brand, description=description, info=info, 
                             url_friendly_name=url_friendly_name, product_img=product_img, id=product_id, general_price=general_price,
                             redirect_url=redirect_url, price_type=price_type, prices_region = [])
     

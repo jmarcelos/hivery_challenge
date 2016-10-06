@@ -32,16 +32,11 @@ class Product(Item):
 
 
     name = Field()
-    ingredients = Field()
-    allergen = Field()
-    servings_per_pack = Field()
-    serving_size = Field()
-    retail_limit = Field()
+    info = Field()
     ticket_type = Field()
     brand = Field()
     description = Field()
     product_img = Field()
-    purchasing_price = Field() 
     last_updated = datetime.datetime.now()  
     id = Field()
     url_friendly_name = Field()
@@ -49,4 +44,3 @@ class Product(Item):
     redirect_url = Field()
     price_type = Field()
     general_price = Field()
-    size = Field()

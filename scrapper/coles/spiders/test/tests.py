@@ -83,13 +83,13 @@ class TestColesSpider(unittest.TestCase):
                 postcode='3182', webstore_id='0645', id='14854')
         coles.regions = [] 
         product = coles.get_product_detail(response)
-        import pdb; pdb.set_trace()
+        expected_info = {u'Contains Barley': u'Allergen:', u'Malted barley, hops, yeast and water.': u'Ingredients:', u'20': u'Size:', u'375ml': u'Serving Size:', u'1.0': u'Servings Per Pack:', u'* Percentage Daily Intake per serving. Percentage Daily Intakes are based on an average adult diet of 8700 kJ. Your daily intakes may be higher or lower depending on your energy needs.': u'Retail Limit:'}
+
         self.assertEquals(product['name'], u'Birell Ultra Light Beer')
         self.assertEquals(product["brand"], u'Birell')
         self.assertEquals(product["general_price"], u'8.25')
-        self.assertEquals(product["serving_size"], u'375ml')
-        self.assertEquals(product["size"], u'20')
         self.assertEquals(product["brand"], u'Birell')
+        self.assertEquals(product['info'], expected_info)
         self.assertEquals(product['redirect_url'], u'https://shop.coles.com.au/webapp/wcs/stores/servlet/national/birell-ultra-light-beer')
 
     def test_get_product_price_per_region(self):
